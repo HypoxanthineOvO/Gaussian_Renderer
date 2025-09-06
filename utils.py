@@ -48,7 +48,11 @@ def quat_to_mat(quaternions: torch.Tensor) -> torch.Tensor:
     )
     return o.reshape(quaternions.shape[:-1] + (3, 3))
 
-def compute_jacobian(means_3D: torch.Tensor, focal_length, view_transform,  img_size):
+def compute_jacobian(
+    means_3D: torch.Tensor, 
+    focal_length, 
+    view_transform,  
+    img_size):
 
     #fx, fy = camera.focal_length.flatten()
     fx, fy = focal_length

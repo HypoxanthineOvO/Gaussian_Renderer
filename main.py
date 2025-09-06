@@ -3,7 +3,7 @@ import torch
 import os
 import matplotlib.pyplot as plt
 
-from Cameras import create_camera
+from Camera import create_camera
 from Gaussian import GaussianModel
 from Renderer import render
 
@@ -12,7 +12,10 @@ if __name__ == "__main__":
     DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
     
     gaussian = GaussianModel(init_type="Gaussians", path=GS_PATH, device = DEVICE)
-    dist, azim, elev = 6.0, 45, 0.0
+    dist, azim, elev = 6.0, 170, 100
+    # camera = create_camera_pytorch3d(
+    #     dist, azim, elev, dim = 256, device = DEVICE
+    # )
     camera = create_camera(
         dist, azim, elev, dim = 256, device = DEVICE
     )

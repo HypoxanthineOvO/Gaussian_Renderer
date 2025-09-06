@@ -2,7 +2,8 @@ import numpy as np
 import math
 import torch
 
-from pytorch3d.renderer.cameras import PerspectiveCameras as PerspectiveCamera
+#from pytorch3d.renderer.cameras import PerspectiveCameras as PerspectiveCamera
+from Camera import PerspectiveCamera
 from Gaussian import GaussianModel
 from utils import compute_jacobian, quat_to_mat, invert_cov_2D
 
@@ -20,12 +21,16 @@ def splat(
     # Do Splatting
     
     ## Project Means
-    means_2d = camera.transform_points_screen(means_3d, img_size = (W, H))[:, :2]
+    ##### means_2d = camera.transform_points_screen(means_3d, img_size = (W, H))[:, :2]
+    means_2d = camera.transform_points_to_screen(means_3d)[:, :2]
     
     ## Compute Cov
-    w2c = camera.get_world_to_view_transform()
-    J = compute_jacobian(means_3d, camera.focal_length.flatten(), w2c, img_size)
-    W_mat = w2c.get_matrix()[:, :3, :3]
+    ##### w2c = camera.get_world_to_view_transform()
+    w2c = camera.get_w2c_transform()
+    ##### J = compute_jacobian(means_3d, camera.focal_length.flatten(), w2c, img_size)
+    J = compute_jacobian(means_3d, (camera.focal_length, camera.focal_length), w2c, img_size)
+    ##### W_mat = w2c.get_matrix()[:, :3, :3]
+    W_mat = w2c.matrix[None, :3, :3]
     ### 各向异性的时候的计算
     S = torch.diag_embed(scales)  # (N, 3, 3)
     normalized_quat = torch.where(quats[..., :1] < 0, -quats, quats)
@@ -89,9 +94,11 @@ def render(
     batch_size = 2048,
     bg_color = (0.0, 0.0, 0.0),
 ):
-    img_size = camera.image_size.type(torch.int32)[0]
+    ##### img_size = camera.image_size.type(torch.int32)[0]
+    img_size = torch.tensor(camera.resolution, device=gaussians.means.device, dtype=torch.int32)
     # Compute Depth values
-    z_vals = camera.get_world_to_view_transform().transform_points(gaussians.means)[..., 2]
+    ##### z_vals = camera.get_world_to_view_transform().transform_points(gaussians.means)[..., 2]
+    z_vals = camera.get_w2c_transform().transform_points(gaussians.means)[..., 2]
     # Sort by depth (far to near)
     sorted_z_vals, sorted_indices = torch.sort(z_vals, descending=False)
     sorted_indices = sorted_indices[sorted_z_vals > 0]
