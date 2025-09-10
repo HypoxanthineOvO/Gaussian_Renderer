@@ -91,7 +91,7 @@ def splat(
 def render(
     camera: PerspectiveCamera,
     gaussians: GaussianModel,
-    batch_size = 2048,
+    batch_size =4096,
     bg_color = (0.0, 0.0, 0.0),
 ):
     ##### img_size = camera.image_size.type(torch.int32)[0]
