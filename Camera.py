@@ -315,7 +315,6 @@ class PerspectiveCamera:
 
 def create_camera(dist: float, azim: float, elev: float, dim: float, up: tuple = (0, -1, 0), device: str = "cpu", cam_source = "PyTorch3D"):
     R, T = get_RT(dist = dist, azim = azim, elev = elev, ref_up = torch.tensor(up, dtype=torch.float32), device = device)
-    print(R.device, T.device)
     camera_config = {
         "Camera_Type": "Perspective",
         "Config_Type": "PyTorch3D",
